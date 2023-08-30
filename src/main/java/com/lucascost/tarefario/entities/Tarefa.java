@@ -3,9 +3,11 @@ package com.lucascost.tarefario.entities;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "tb_tarefa")
+@Table(name = "tarefa")
 public class Tarefa {
 
     @Id
@@ -21,6 +23,11 @@ public class Tarefa {
 
     private Boolean concluida;
 
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "tarefa_categoria",
+            joinColumns = @JoinColumn(name = "tarefa_id"),
+            inverseJoinColumns = @JoinColumn(name = "categoria_id"))
+    private List<Categoria> categorias = new ArrayList<>();
     public Tarefa() {
     }
 
@@ -70,6 +77,17 @@ public class Tarefa {
 
     public void setConcluida(Boolean concluida) {
         this.concluida = concluida;
+    }
+
+    public void addCategoria(Categoria categoria){
+        this.categorias.add(categoria);
+    }
+    public List<Categoria> getCategorias() {
+        return categorias;
+    }
+
+    public void setCategorias(List<Categoria> categorias) {
+        this.categorias = categorias;
     }
 
     @Override

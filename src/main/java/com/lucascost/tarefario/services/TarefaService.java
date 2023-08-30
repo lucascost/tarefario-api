@@ -1,19 +1,28 @@
 package com.lucascost.tarefario.services;
 
+import com.lucascost.tarefario.dto.CategoriaDTO;
 import com.lucascost.tarefario.dto.TarefaDTO;
+import com.lucascost.tarefario.entities.Categoria;
 import com.lucascost.tarefario.entities.Tarefa;
+import com.lucascost.tarefario.repository.CategoriaRepository;
 import com.lucascost.tarefario.repository.TarefaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class TarefaService {
     @Autowired
     private TarefaRepository tarefaRepository;
+
+    @Autowired
+    private CategoriaRepository categoriaRepository;
+
 
     @Transactional(readOnly = true)
     public List<TarefaDTO> findAll(){
@@ -25,12 +34,7 @@ public class TarefaService {
     public TarefaDTO findById(Long id){
         Optional<Tarefa> tarefa = tarefaRepository.findById(id);
         Tarefa result;
-        if (tarefa.isPresent()) {
-            result = tarefa.get();
-        } else {
-            return null;
-        }
-        return new TarefaDTO(result);
+        return tarefa.map(TarefaDTO::new).orElse(null);
     }
 
     @Transactional
@@ -42,24 +46,32 @@ public class TarefaService {
         novaTarefa.setConcluida(tarefaDTO.getConcluida());
 
         return  tarefaRepository.save(novaTarefa);
+
     }
 
     @Transactional
     public boolean atualizarTarefa(Long id, TarefaDTO tarefaDTO){
         Optional<Tarefa> tarefaAtual = tarefaRepository.findById(id);
 
-        if(tarefaAtual.isPresent()){
+        if(tarefaAtual.isPresent()) {
             Tarefa tarefa = tarefaAtual.get();
             tarefa.setNome(tarefaDTO.getNome());
             tarefa.setDatetime_inicio(tarefaDTO.getDatetime_inicio());
             tarefa.setDatetime_termino(tarefaDTO.getDatetime_termino());
             tarefa.setConcluida(tarefaDTO.getConcluida());
 
+            List<Categoria> categoriasValidas = new ArrayList<>();
+            for (Categoria categoria : tarefaDTO.getCategorias()) {
+                Optional<Categoria> categoriaCadastrada = categoriaRepository.findById(categoria.getId());
+                if (categoriaCadastrada.isPresent() && categoria.equals(categoriaCadastrada.get()))
+                    categoriasValidas.add(categoria);
+            }
+            tarefa.setCategorias(categoriasValidas);
+
             tarefaRepository.save(tarefa);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Transactional
@@ -69,7 +81,24 @@ public class TarefaService {
         if(tarefa.isPresent()) {
             tarefaRepository.delete(tarefa.get());
             return true;
-        } else return false;
+        }
+        return false;
 
+    }
+    @Transactional
+    public boolean associarCategoriaTarefa(Long tarefaId, Long categoriaId) {
+        List<Categoria> categoriaList;
+        Tarefa tarefa = tarefaRepository.findById(tarefaId).orElse(null);
+        Categoria categoria = categoriaRepository.findById(categoriaId).orElse(null);
+
+        if (tarefa != null && categoria != null) {
+            categoriaList = tarefa.getCategorias();
+            categoriaList.add(categoria);
+            tarefa.setCategorias(categoriaList);
+            tarefaRepository.save(tarefa);
+            return true;
+        }
+
+        return false;
     }
 }

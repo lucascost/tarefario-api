@@ -1,9 +1,11 @@
 package com.lucascost.tarefario.dto;
 
+import com.lucascost.tarefario.entities.Categoria;
 import com.lucascost.tarefario.entities.Tarefa;
 import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class TarefaDTO {
     private Long id;
@@ -11,6 +13,7 @@ public class TarefaDTO {
     private LocalDateTime datetime_inicio;
     private LocalDateTime datetime_termino;
     private Boolean concluida;
+    private List<Categoria> categorias;
 
     public TarefaDTO() {
     }
@@ -57,5 +60,13 @@ public class TarefaDTO {
 
     public void setConcluida(Boolean concluida) {
         this.concluida = concluida;
+    }
+
+    public List<Categoria> getCategorias() {
+        return categorias;
+    }
+
+    public void setCategorias(List<Categoria> categorias) {
+        this.categorias = categorias;
     }
 }

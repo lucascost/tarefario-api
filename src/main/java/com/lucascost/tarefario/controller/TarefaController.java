@@ -31,37 +31,43 @@ public class TarefaController {
         TarefaDTO tarefa = tarefaService.findById(id);
         if (tarefa != null)
             return ResponseEntity.ok(tarefa);
-        else
-            return ResponseEntity.notFound().build();
+
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping
     public ResponseEntity<String> cadastrarTarefa(@RequestBody TarefaDTO tarefaDTO){
         Tarefa novaTarefa = tarefaService.cadastrarTarefa(tarefaDTO);
-        if (novaTarefa != null) {
+        if (novaTarefa != null)
             return ResponseEntity.ok("Tarefa cadastrada com sucesso!");
-        } else {
-            return ResponseEntity.badRequest().body("Falha ao cadastrar a tarefa.");
-        }
+
+        return ResponseEntity.badRequest().body("Falha ao cadastrar a tarefa.");
     }
 
     @PutMapping("atualizar/{id}")
     public ResponseEntity<String> atualizarTarefa(@PathVariable Long id, @RequestBody TarefaDTO tarefaDTO){
         boolean atualizacaoBemSucedida = tarefaService.atualizarTarefa(id, tarefaDTO);
-        if (atualizacaoBemSucedida) {
+        if (atualizacaoBemSucedida)
             return ResponseEntity.ok("Tarefa atualizada com sucesso!");
-        } else {
-            return ResponseEntity.badRequest().body("Falha ao atualizar a tarefa.");
-        }
+
+        return ResponseEntity.badRequest().body("Falha ao atualizar a tarefa.");
     }
 
     @DeleteMapping("deletar/{id}")
     public ResponseEntity<String> deletarTarefa(@PathVariable Long id ){
         boolean remocaoBemSucedida = tarefaService.deletarTarefa(id);
-        if (remocaoBemSucedida) {
+        if (remocaoBemSucedida)
             return ResponseEntity.ok("Tarefa removida com sucesso!");
-        } else {
-            return ResponseEntity.badRequest().body("Falha ao remover a tarefa.");
-        }
+
+        return ResponseEntity.badRequest().body("Falha ao remover a tarefa.");
+    }
+
+    @PutMapping("atualizar/{tarefaId}/add-categoria/{categoriaId}")
+    public ResponseEntity<String> associarCategoriaTarefa(@PathVariable Long tarefaId, @PathVariable Long categoriaId){
+        boolean categoriaAdicionada = tarefaService.associarCategoriaTarefa(tarefaId, categoriaId);
+        if(categoriaAdicionada)
+            return ResponseEntity.ok("Categoria adicionada com sucesso!");
+
+        return ResponseEntity.badRequest().body("Falha ao adicionar a categoria.");
     }
 }
