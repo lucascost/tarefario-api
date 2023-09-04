@@ -1,6 +1,5 @@
 package com.lucascost.tarefario.services;
 
-import com.lucascost.tarefario.dto.CategoriaDTO;
 import com.lucascost.tarefario.dto.TarefaDTO;
 import com.lucascost.tarefario.entities.Categoria;
 import com.lucascost.tarefario.entities.Tarefa;
@@ -13,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class TarefaService {
@@ -33,7 +31,6 @@ public class TarefaService {
     @Transactional(readOnly = true)
     public TarefaDTO findById(Long id){
         Optional<Tarefa> tarefa = tarefaRepository.findById(id);
-        Tarefa result;
         return tarefa.map(TarefaDTO::new).orElse(null);
     }
 
@@ -47,6 +44,12 @@ public class TarefaService {
 
         return  tarefaRepository.save(novaTarefa);
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<TarefaDTO> findAllByName(String searchQuery){
+        List<Tarefa> tarefas = tarefaRepository.findByNomeIgnoreCaseContaining(searchQuery);
+        return tarefas.stream().map(TarefaDTO::new).toList();
     }
 
     @Transactional
@@ -101,4 +104,5 @@ public class TarefaService {
 
         return false;
     }
+
 }

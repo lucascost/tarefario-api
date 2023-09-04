@@ -26,6 +26,16 @@ public class TarefaController {
         }
     }
 
+    @GetMapping("/busca")
+    public ResponseEntity<List<TarefaDTO>> findAllByName(@RequestParam("query") String searchQuery){
+        List<TarefaDTO> tarefaList = tarefaService.findAllByName(searchQuery);
+        if (!tarefaList.isEmpty()) {
+            return ResponseEntity.ok(tarefaList);
+        } else {
+            return ResponseEntity.noContent().build();
+        }
+    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<TarefaDTO> findById(@PathVariable Long id) {
         TarefaDTO tarefa = tarefaService.findById(id);
